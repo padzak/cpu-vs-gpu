@@ -11,7 +11,7 @@ Repository link - `https://github.com/lvandeve/lodepng/tree/master`
 
 Download the English handwriting dataset from - `https://www.kaggle.com/datasets/sujaymann/handwritten-english-characters-and-digits?resource=download`
 
-Unload contents of `handwriting/handwritten-english-characters-and-digits/combined_folder/train` to `../datasets/train`.
+Unload contents of `handwriting/handwritten-english-characters-and-digits/combined_folder/train` to `NeuralNetwork/datasets/train`.
 
 # CPU
 
@@ -21,7 +21,7 @@ Unload contents of `handwriting/handwritten-english-characters-and-digits/combin
 
 ### Run
 
-`./cpu_net ../datasets/handwriting/handwritten-english-characters-and-digits/combined_folder/train`
+`./cpu_net ../datasets/handwriting/train`
 
 # GPU
 
