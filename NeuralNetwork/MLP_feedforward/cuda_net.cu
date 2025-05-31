@@ -35,13 +35,13 @@ void linear_forward(int M, int N, int K,
 
 // <<<N blocks, K threads>>> accumulate dW[k][j] += dY[k]*X[j]
 __global__
-void grad_w(int N,int K,
+void grad_w(int N, int K,
             const float* dY, const float* X,
             float* dW, int M)
 {
     int row = blockIdx.x;
     int col = threadIdx.x;
-    if(row>=N || col>=K) 
+    if (row >= N || col >= K) 
     {
         return;
     }
@@ -112,25 +112,28 @@ int main(int argc,char** argv)
     for(int epoch = 0; epoch < EPOCHS; ++epoch)
     {
         std::shuffle(data.begin(),data.end(),rng);
-        size_t idx=0;
-        while(idx<Nall){
-            size_t cur=std::min((size_t)BATCH,Nall-idx);
+        size_t idx = 0;
+        while(idx < Nall)
+        {
+            size_t cur = std::min((size_t) BATCH, Nall - idx);
             // copy pictures to pinned host buffer
             for(size_t m=0;m<cur;++m)
-                std::memcpy(&h_X[m*INPUT],data[idx+m].pixels.data(),INPUT*sizeof(float));
-            CUDA_CHECK(cudaMemcpy(d_X,h_X,cur*INPUT*4,cudaMemcpyHostToDevice));
+            {
+                std::memcpy(&h_X[m * INPUT], data[idx + m].pixels.data(), INPUT * sizeof(float));
+            }
+            CUDA_CHECK(cudaMemcpy(d_X, h_X, cur * INPUT * 4, cudaMemcpyHostToDevice));
 
             // ---- forward hidden ----
-            linear_forward<<<cur, HIDDEN>>>(cur,HIDDEN,INPUT,d_X,d_W1,d_b1,d_H);
+            linear_forward<<<cur, HIDDEN>>>(cur, HIDDEN, INPUT, d_X, d_W1, d_b1, d_H);
             // ReLU
-            int threads=256, blocks=(cur*HIDDEN+threads-1)/threads;
+            int threads = 256, blocks=(cur*HIDDEN+threads-1)/threads;
             relu_kernel<<<blocks,threads>>>(d_H,cur*HIDDEN);
             // forward output
-            linear_forward<<<cur, OUTPUT>>>(cur,OUTPUT,HIDDEN,d_H,d_W2,d_b2,d_Y);
+            linear_forward<<<cur, OUTPUT>>>(cur, OUTPUT, HIDDEN, d_H, d_W2, d_b2, d_Y);
 
             // ---- softmax + loss grad on host (small) ----
-            CUDA_CHECK(cudaMemcpy(h_Y,d_Y,cur*OUTPUT*4,cudaMemcpyDeviceToHost));
-            float loss=0;
+            CUDA_CHECK(cudaMemcpy(h_Y, d_Y, cur * OUTPUT * 4, cudaMemcpyDeviceToHost));
+            float loss = 0;
             for(size_t m = 0; m < cur; ++m)
             {
                 // softmax
@@ -145,13 +148,13 @@ int main(int argc,char** argv)
                 {
                     row[k] /= sum;
                 }
-                int lbl=data[idx+m].label;
+                int lbl = data[idx+m].label;
                 loss += -std::log(std::max(row[lbl], 1e-8f));
                 
                 // dY = prob - 1(label)
                 for(int k = 0; k < OUTPUT; ++k) 
                 {
-                    h_dY[m*OUTPUT+k]=row[k] - (k==lbl);
+                    h_dY[m * OUTPUT + k] = row[k] - (k == lbl);
                 }
             }
             CUDA_CHECK(cudaMemcpy(d_dW2, h_dY, cur * OUTPUT * 4, cudaMemcpyHostToDevice));
