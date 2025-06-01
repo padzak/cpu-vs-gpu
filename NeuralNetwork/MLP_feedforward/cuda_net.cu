@@ -63,6 +63,20 @@ inline void init_rand(float* ptr, size_t n, float std = 0.05f){
     }
 }
 
+__global__ void relu_kernel(float* data, int N) {
+    int i = blockIdx.x * blockDim.x + threadIdx.x;
+    if (i < N) {
+        data[i] = fmaxf(0.0f, data[i]);
+    }
+}
+
+__global__ void saxpy(float* y, const float* x, float alpha, int N) {
+    int i = blockIdx.x * blockDim.x + threadIdx.x;
+    if (i < N) {
+        y[i] += alpha * x[i];
+    }
+}
+
 int main(int argc,char** argv)
 {
     std::string root = argc > 1 ? argv[1] : "train";
