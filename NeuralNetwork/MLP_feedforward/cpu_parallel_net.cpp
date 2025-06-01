@@ -41,7 +41,8 @@ int main(int argc, char** argv){
 
             for (size_t i = idx; i < end; ++i)
             {
-                threads.emplace_back([&, i]() {
+                threads.emplace_back([&, i]()
+                {
                     const auto& s = data[i];
                     const Vec& in = s.pixels;
                     int label = s.label;
@@ -50,7 +51,9 @@ int main(int argc, char** argv){
 
                     mmv(W1, in, h, b1);
                     for (int j = 0; j < HIDDEN; ++j)
+                    {
                         h_act[j] = std::max(0.f, h[j]);
+                    }
 
                     mmv(W2, h_act, y_hat, b2);
                     softmax(y_hat);
@@ -62,28 +65,42 @@ int main(int argc, char** argv){
                     Vec local_db2(OUTPUT, 0);
 
                     for (int j = 0; j < HIDDEN; ++j)
+                    {
                         for (int k = 0; k < OUTPUT; ++k)
+                        {    
                             local_dW2[k][j] += delta2[k] * h_act[j];
+                        }
+                    }
 
                     for (int k = 0; k < OUTPUT; ++k)
+                    {
                         local_db2[k] += delta2[k];
+                    }
 
                     std::fill(grad_h.begin(), grad_h.end(), 0);
                     for (int j = 0; j < HIDDEN; ++j)
                     {
                         for (int k = 0; k < OUTPUT; ++k)
+                        {
                             grad_h[j] += W2[k][j] * delta2[k];
+                        }
                         grad_h[j] *= (h[j] > 0);
                     }
 
                     Mat local_dW1(HIDDEN, Vec(INPUT, 0));
                     Vec local_db1(HIDDEN, 0);
                     for (int j = 0; j < INPUT; ++j)
+                    {
                         for (int k = 0; k < HIDDEN; ++k)
+                        { 
                             local_dW1[k][j] += grad_h[k] * in[j];
-
+                        }
+                    }
+                    
                     for (int k = 0; k < HIDDEN; ++k)
+                    {
                         local_db1[k] += grad_h[k];
+                    }
 
                     std::lock_guard<std::mutex> lock(mutex);
                     batch_loss += loss;
@@ -91,19 +108,27 @@ int main(int argc, char** argv){
                     {
                         gb2[k] += local_db2[k];
                         for (int j = 0; j < HIDDEN; ++j)
+                        {
                             gW2[k][j] += local_dW2[k][j];
+                        }
                     }
+
                     for (int k = 0; k < HIDDEN; ++k)
                     {
                         gb1[k] += local_db1[k];
                         for (int j = 0; j < INPUT; ++j)
+                        {
                             gW1[k][j] += local_dW1[k][j];
+                        }
                     }
                 });
 
                 if (threads.size() == N_THREADS || i == end - 1)
                 {
-                    for (auto& t : threads) t.join();
+                    for (auto& t : threads) 
+                    {
+                        t.join();
+                    }
                     threads.clear();
                 }
             }
@@ -114,13 +139,18 @@ int main(int argc, char** argv){
             {
                 b1[k] -= scale * gb1[k];
                 for (int j = 0; j < INPUT; ++j)
+                {
                     W1[k][j] -= scale * gW1[k][j];
+                }
             }
+
             for (int k = 0; k < OUTPUT; ++k)
             {
                 b2[k] -= scale * gb2[k];
                 for (int j = 0; j < HIDDEN; ++j)
+                {        
                     W2[k][j] -= scale * gW2[k][j];
+                }
             }
 
             epoch_loss += batch_loss;
