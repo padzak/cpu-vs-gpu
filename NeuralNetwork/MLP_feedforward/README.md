@@ -15,6 +15,8 @@ Unload contents of `handwriting/handwritten-english-characters-and-digits/combin
 
 # CPU
 
+## Procedural
+
 ### Compile
 
 `g++ -O3 -std=c++17 cpu_net.cpp lodepng.cpp -o cpu_net`
@@ -22,6 +24,16 @@ Unload contents of `handwriting/handwritten-english-characters-and-digits/combin
 ### Run
 
 `./cpu_net ../datasets/handwriting/train`
+
+## Parallel
+
+### Compile
+
+`g++ -std=c++17 -O3 -pthread cpu_parallel_net.cpp -o cpu_parallel_mt`
+
+### Run
+
+`./cpu_parallel_mt ../datasets/handwriting/train`
 
 # GPU
 
