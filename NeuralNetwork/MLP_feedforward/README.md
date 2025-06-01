@@ -19,7 +19,11 @@ Unload contents of `handwriting/handwritten-english-characters-and-digits/combin
 
 ### Compile
 
+G++:
 `g++ -O3 -std=c++17 cpu_net.cpp lodepng.cpp -o cpu_net`
+
+MSVC:
+`cl /std:c++17 /O2 cpu_net.cpp lodepng.cpp`
 
 ### Run
 
@@ -29,11 +33,15 @@ Unload contents of `handwriting/handwritten-english-characters-and-digits/combin
 
 ### Compile
 
-`g++ -std=c++17 -O3 -pthread cpu_parallel_net.cpp -o cpu_parallel_mt`
+G++: 
+`g++ -std=c++17 -O3 -pthread cpu_parallel_net.cpp lodepng.cpp -o cpu_parallel_net`
+
+MSVC:
+`cl /std:c++17 /O2 cpu_parallel_net.cpp`
 
 ### Run
 
-`./cpu_parallel_mt ../datasets/handwriting/train`
+`./cpu_parallel_net ../datasets/handwriting/train`
 
 # GPU
 
