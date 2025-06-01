@@ -8,7 +8,7 @@
 #include <filesystem>
 #include <random>
 #include <vector>
-
+#include <unordered_map>
 
 struct Sample {
     std::vector<float> pixels;

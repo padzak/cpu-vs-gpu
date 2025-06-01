@@ -29,7 +29,7 @@ Unload contents of `handwriting/handwritten-english-characters-and-digits/combin
 
 ### Compile
 
-`nvcc -O3 -std=c++17 gpu_net.cu lodepng.cpp -o cuda_net`
+`nvcc -O3 -std=c++17 cuda_net.cu lodepng.cpp -o cuda_net`
 
 ### Run
 
